@@ -1,15 +1,23 @@
 import pygame
 
 class Note(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, key):
+        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("assets/note.png").convert_alpha()
         self.image_size = self.image.get_size()
         self.zoom = 3
         self.image = pygame.transform.scale(self.image, (self.image_size[0] * self.zoom, self.image_size[1] * self.zoom))
-        self.image_rect = self.image.get_rect()
-        self.scroll_speed = 0
+        self.rect = self.image.get_rect()
+        self.scroll_speed = 6
 
-    def move(self, direc, val):
-        if direc == "down":
-            self.image_rect.y -= val
-            print("asd")
+        if key == "S":
+            self.rect.x = 70
+        if key == "D":
+            self.rect.x = 170
+        if key == "K":
+            self.rect.x = 270
+        if key == "L":
+            self.rect.x = 370
+
+    def update(self):
+        self.rect.y += self.scroll_speed

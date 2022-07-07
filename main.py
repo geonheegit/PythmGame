@@ -15,6 +15,9 @@ screen = pygame.display.set_mode([WIDTH, HEIGHT], HWSURFACE)
 # 모든 스프라이트 그룹
 all_sprite = pygame.sprite.Group()
 
+# 게임 속 계산 변수들
+score_val = 0
+
 # 화면 택스처
 main_bg = pygame.image.load("assets/main_bg.png")  # 80 x 60 px
 main_bg = pygame.transform.scale(main_bg, (800, 600))  # 800 x 600 px
@@ -40,13 +43,33 @@ BPM = 202
 count = 0
 
 # 폰트
-font = pygame.font.SysFont("arial", 30, True, False)
+font = pygame.font.Font("assets/font/Facon.ttf", 30)
 dark_yellow = (255, 172, 5)
 green = (100, 158, 0)
 
+score_text = font.render("Score: ", True, (0, 0, 0))
+
+
+score_calc_text = font.render(str(score_val), True, (0, 0, 0))
+def score_add(val):
+    global score_calc_text
+    global score_val
+    score_val += val
+    score_calc_text = font.render(str(score_val), True, (0, 0, 0))
+
+
+# 판정 이미지
 perfect_text = pygame.image.load("assets/perfect_text.png").convert_alpha()
 good_text = pygame.image.load("assets/good_text.png").convert_alpha()
 bad_text = pygame.image.load("assets/bad_text.png").convert_alpha()
+
+# 이미지 위치 조정 변수
+add_val = 0
+text_p_posx = 200
+text_g_posx = 200
+text_b_posx = 200
+
+print(perfect_text.get_size(), good_text.get_size(), bad_text.get_size())
 
 # 노트 맞춘 시간
 note_hit_time = 0
@@ -111,73 +134,123 @@ while running:
             input_time = time.time()
             key_input = pygame.key.get_pressed()
 
+            # 판정  // Perfect - 300, Good - 150, Bad - 50, Miss - 0
             for each_note in note_group:
                 if key_input[pygame.K_s]:
                     lane_light_s = "S"
                     if per_start <= each_note.rect.y <= per_last:
+                        # 애니메이션 겹침 방지용 변수 초기화
+                        perfect_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(300)
                         perfect_input = True
 
                     elif per_start - 15 <= each_note.rect.y <= per_last + 15:
+                        good_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(150)
                         good_input = True
 
                     elif per_start - 40 <= each_note.rect.y <= per_last + 40:
+                        bad_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(50)
                         bad_input = True
 
                 if key_input[pygame.K_d]:
                     lane_light_d = "D"
                     if per_start <= each_note.rect.y <= per_last:
+                        perfect_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(300)
                         perfect_input = True
 
                     elif per_start - 15 <= each_note.rect.y <= per_last + 15:
+                        good_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(150)
                         good_input = True
 
                     elif per_start - 40 <= each_note.rect.y <= per_last + 40:
+                        bad_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(50)
                         bad_input = True
 
                 if key_input[pygame.K_k]:
                     lane_light_k = "K"
                     if per_start <= each_note.rect.y <= per_last:
+                        perfect_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(300)
                         perfect_input = True
 
                     elif per_start - 15 <= each_note.rect.y <= per_last + 15:
+                        good_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(150)
                         good_input = True
 
                     elif per_start - 40 <= each_note.rect.y <= per_last + 40:
+                        bad_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(50)
                         bad_input = True
 
                 if key_input[pygame.K_l]:
                     lane_light_l = "L"
                     if per_start <= each_note.rect.y <= per_last:
+                        perfect_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(300)
                         perfect_input = True
 
                     elif per_start - 15 <= each_note.rect.y <= per_last + 15:
+                        good_input = False
+                        add_val = 0
+
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(150)
                         good_input = True
 
                     elif per_start - 40 <= each_note.rect.y <= per_last + 40:
+                        bad_input = False
+                        add_val = 0
+                        
                         each_note.kill()
                         note_hit_time = time.time()
+                        score_add(50)
                         bad_input = True
                 
     # 키 입력 땠을 때
@@ -242,32 +315,63 @@ while running:
     # 판정 이미지 화면에 0.2초간 띄우기
     if perfect_input:
         now = time.time()
-        if now - note_hit_time <= 0.2:
+        elapsed = now - note_hit_time
+        if elapsed <= 0.2:
             # 다른 판정 변수 다 False 해준 뒤, screen blit.
             good_input = False
             bad_input = False
-            screen.blit(perfect_text, (200, 50))
+
+            # Perfect 애니메이션
+            add_val += 6
+            if add_val > 255:
+                add_val = 255
+            perfect_text.set_alpha(255 - add_val)  # 흐릿하게
+            screen.blit(perfect_text, (200 * (1 / add_val) + text_p_posx, 50))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
         else:
             perfect_input = False
+            add_val = 0
 
     elif good_input:
         now = time.time()
-        if now - note_hit_time <= 0.2:
+        elapsed = now - note_hit_time
+        if elapsed <= 0.2:
             perfect_input = False
             bad_input = False
-            screen.blit(good_text, (200, 50))
+
+            # Good 애니메이션
+            add_val += 6
+            if add_val > 255:
+                add_val = 255
+            good_text.set_alpha(255 - add_val)  # 흐릿하게
+            screen.blit(good_text, (200 * (1 / add_val) + text_g_posx, 50))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
         else:
             good_input = False
+            add_val = 0
 
     elif bad_input:
         now = time.time()
-        if now - note_hit_time <= 0.2:
+        elapsed = now - note_hit_time
+        if elapsed <= 0.2:
             perfect_input = False
             good_input = False
-            screen.blit(bad_text, (200, 50))
+
+            # Bad 애니메이션
+            add_val += 6
+            if add_val > 255:
+                add_val = 255
+            bad_text.set_alpha(255 - add_val)  # 흐릿하게
+            screen.blit(bad_text, (200 * (1 / add_val) + text_b_posx, 50))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
         else:
             bad_input = False
+            add_val = 0
 
+    # 오른쪽 네모박스 속 요소들
+    # score
+    screen.blit(score_text, (520, 30))
+    screen.blit(score_calc_text, (650, 33))
+
+
+    # 화면에 그리기 업데이트
     note_group.draw(screen)
     note_group.update(HEIGHT)
     pygame.display.update()

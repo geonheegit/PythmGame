@@ -1,12 +1,16 @@
 import time
 import pygame
+from pygame import DOUBLEBUF, HWSURFACE, FULLSCREEN
+
 import note
 
 # 초기화
 pygame.init()
 
 # 화면 설정
-screen = pygame.display.set_mode([800, 600])
+WIDTH = 800
+HEIGHT = 600
+screen = pygame.display.set_mode([WIDTH, HEIGHT], HWSURFACE)
 
 # 모든 스프라이트 그룹
 all_sprite = pygame.sprite.Group()
@@ -55,7 +59,6 @@ with open(note_data_file, 'r') as file:
 
 # note_data.txt에서 빈 줄 제거 알고리즘
 for i in range(len(note_data)):
-    print(i)
     note_data[i] = [n for n in note_data[i] if n]
 
 icount = 0
@@ -85,7 +88,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            
+
     # 키 입력
         if event.type == pygame.KEYDOWN:
             key_input = pygame.key.get_pressed()
@@ -116,8 +119,7 @@ while running:
             if event.key == pygame.K_l:
                 lane_light_l = "None"
 
-
-    # testnote.image_rect.y += testnote.scroll_speed
+    # 배경 그리기
     screen.blit(main_bg, (0, 0))
 
     # 레인 입력 이펙트 감지 및 출력
@@ -162,8 +164,8 @@ while running:
                 all_sprite.add(notes)
                 note_group.add(notes)
 
-    all_sprite.draw(screen)
-    note_group.update()
+    note_group.update(HEIGHT)
+    note_group.draw(screen)
     pygame.display.update()
 
 pygame.quit()

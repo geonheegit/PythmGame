@@ -19,5 +19,7 @@ class Note(pygame.sprite.Sprite):
         if key == "L":
             self.rect.x = 370
 
-    def update(self):
+    def update(self, HEIGHT):
         self.rect.y += self.scroll_speed
+        if self.rect.y > HEIGHT:
+            self.kill()

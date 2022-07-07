@@ -9,6 +9,7 @@ class Note(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (self.image_size[0] * self.zoom, self.image_size[1] * self.zoom))
         self.rect = self.image.get_rect()
         self.scroll_speed = 6
+        self.key = key
 
         if key == "S":
             self.rect.x = 70

@@ -17,6 +17,10 @@ all_sprite = pygame.sprite.Group()
 
 # 게임 속 계산 변수들
 score_val = 0
+perfect_num = 0
+good_num = 0
+bad_num = 0
+total_hit_num = 0
 
 # 화면 택스처
 main_bg = pygame.image.load("assets/main_bg.png")  # 80 x 60 px
@@ -49,7 +53,12 @@ green = (100, 158, 0)
 
 score_text = font.render("Score: ", True, (0, 0, 0))
 
+perfect_num_text = font.render("Perfect: ", True, (0, 0, 0))
+good_num_text = font.render("Good: ", True, (0, 0, 0))
+bad_num_text = font.render("Bad: ", True, (0, 0, 0))
+total_hit_num_text = font.render("Total: ", True, (0, 0, 0))
 
+# 점수 계산 텍스트
 score_calc_text = font.render(str(score_val), True, (0, 0, 0))
 def score_add(val):
     global score_calc_text
@@ -57,6 +66,37 @@ def score_add(val):
     score_val += val
     score_calc_text = font.render(str(score_val), True, (0, 0, 0))
 
+# Perfect 개수 계산 텍스트
+perfect_num_calc_text = font.render(str(perfect_num), True, (0, 0, 0))
+def perfect_add():
+    global perfect_num_calc_text
+    global perfect_num
+    perfect_num += 1
+    perfect_num_calc_text = font.render(str(perfect_num), True, (0, 0, 0))
+
+# Good 개수 계산 텍스트
+good_num_calc_text = font.render(str(good_num), True, (0, 0, 0))
+def good_add():
+    global good_num_calc_text
+    global good_num
+    good_num += 1
+    good_num_calc_text = font.render(str(good_num), True, (0, 0, 0))
+
+# Bad 개수 계산 텍스트
+bad_num_calc_text = font.render(str(bad_num), True, (0, 0, 0))
+def bad_add():
+    global bad_num_calc_text
+    global bad_num
+    bad_num += 1
+    bad_num_calc_text = font.render(str(bad_num), True, (0, 0, 0))
+
+# Bad 개수 계산 텍스트
+total_num_calc_text = font.render(str(total_hit_num), True, (0, 0, 0))
+def total_update():
+    global total_num_calc_text
+    global total_hit_num
+    total_hit_num = perfect_num + good_num + bad_num
+    total_num_calc_text = font.render(str(total_hit_num), True, (0, 0, 0))
 
 # 판정 이미지
 perfect_text = pygame.image.load("assets/perfect_text.png").convert_alpha()
@@ -138,120 +178,172 @@ while running:
             for each_note in note_group:
                 if key_input[pygame.K_s]:
                     lane_light_s = "S"
-                    if per_start <= each_note.rect.y <= per_last:
-                        # 애니메이션 겹침 방지용 변수 초기화
-                        perfect_input = False
-                        add_val = 0
+                    if each_note.key == "S":
+                        if per_start <= each_note.rect.centery <= per_last:
+                            # 애니메이션 겹침 방지용 변수 초기화
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(300)
-                        perfect_input = True
+                            each_note.kill()  # 친 노트 객체 삭제
+                            note_hit_time = time.time()  # 노트를 친 순간 기록
+                            score_add(300)  # 점수 추가
+                            perfect_add()  # 퍼펙 개수 1 추가
+                            total_update()  # 전체 개수
+                            perfect_input = True
 
-                    elif per_start - 15 <= each_note.rect.y <= per_last + 15:
-                        good_input = False
-                        add_val = 0
+                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(150)
-                        good_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(150)
+                            good_add()  # Good 개수 1 추가
+                            total_update()  # 전체 개수
+                            good_input = True
 
-                    elif per_start - 40 <= each_note.rect.y <= per_last + 40:
-                        bad_input = False
-                        add_val = 0
+                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(50)
-                        bad_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(50)
+                            bad_add()  # Bad 개수 1 추가
+                            total_update()  # 전체 개수
+                            bad_input = True
 
                 if key_input[pygame.K_d]:
                     lane_light_d = "D"
-                    if per_start <= each_note.rect.y <= per_last:
-                        perfect_input = False
-                        add_val = 0
+                    if each_note.key == "D":
+                        if per_start <= each_note.rect.centery <= per_last:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(300)
-                        perfect_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(300)
+                            perfect_add()  # 퍼펙 개수 1 추가
+                            total_update()  # 전체 개수
+                            perfect_input = True
 
-                    elif per_start - 15 <= each_note.rect.y <= per_last + 15:
-                        good_input = False
-                        add_val = 0
+                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(150)
-                        good_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(150)
+                            good_add()  # Good 개수 1 추가
+                            total_update()  # 전체 개수
+                            good_input = True
 
-                    elif per_start - 40 <= each_note.rect.y <= per_last + 40:
-                        bad_input = False
-                        add_val = 0
+                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(50)
-                        bad_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(50)
+                            bad_add()  # Bad 개수 1 추가
+                            total_update()  # 전체 개수
+                            bad_input = True
 
                 if key_input[pygame.K_k]:
                     lane_light_k = "K"
-                    if per_start <= each_note.rect.y <= per_last:
-                        perfect_input = False
-                        add_val = 0
+                    if each_note.key == "K":
+                        if per_start <= each_note.rect.centery <= per_last:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(300)
-                        perfect_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(300)
+                            perfect_add()  # 퍼펙 개수 1 추가
+                            total_update()  # 전체 개수
+                            perfect_input = True
 
-                    elif per_start - 15 <= each_note.rect.y <= per_last + 15:
-                        good_input = False
-                        add_val = 0
+                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(150)
-                        good_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(150)
+                            good_add()  # Good 개수 1 추가
+                            total_update()  # 전체 개수
+                            good_input = True
 
-                    elif per_start - 40 <= each_note.rect.y <= per_last + 40:
-                        bad_input = False
-                        add_val = 0
+                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(50)
-                        bad_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(50)
+                            bad_add()  # Bad 개수 1 추가
+                            total_update()  # 전체 개수
+                            bad_input = True
 
                 if key_input[pygame.K_l]:
                     lane_light_l = "L"
-                    if per_start <= each_note.rect.y <= per_last:
-                        perfect_input = False
-                        add_val = 0
+                    if each_note.key == "L":
+                        if per_start <= each_note.rect.centery <= per_last:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(300)
-                        perfect_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(300)
+                            perfect_add()  # 퍼펙 개수 1 추가
+                            total_update()  # 전체 개수
+                            perfect_input = True
 
-                    elif per_start - 15 <= each_note.rect.y <= per_last + 15:
-                        good_input = False
-                        add_val = 0
+                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
 
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(150)
-                        good_input = True
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(150)
+                            good_add()  # Good 개수 1 추가
+                            total_update()  # 전체 개수
+                            good_input = True
 
-                    elif per_start - 40 <= each_note.rect.y <= per_last + 40:
-                        bad_input = False
-                        add_val = 0
-                        
-                        each_note.kill()
-                        note_hit_time = time.time()
-                        score_add(50)
-                        bad_input = True
+                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                            perfect_input = False
+                            good_input = False
+                            bad_input = False
+                            add_val = 0
+
+                            each_note.kill()
+                            note_hit_time = time.time()
+                            score_add(50)
+                            bad_add()  # Bad 개수 1 추가
+                            total_update()  # 전체 개수
+                            bad_input = True
                 
     # 키 입력 땠을 때
         if event.type == pygame.KEYUP:
@@ -370,8 +462,31 @@ while running:
     screen.blit(score_text, (520, 30))
     screen.blit(score_calc_text, (650, 33))
 
+    # Perfect 개수
+    screen.blit(perfect_num_text, (520, 90))
+    screen.blit(perfect_num_calc_text, (685, 93))
+
+    # Good 개수
+    screen.blit(good_num_text, (520, 120))
+    screen.blit(good_num_calc_text, (630, 123))
+
+    # Bad 개수
+    screen.blit(bad_num_text, (520, 150))
+    screen.blit(bad_num_calc_text, (600, 153))
+
+    # Total 개수
+    screen.blit(total_hit_num_text, (520, 180))
+    screen.blit(total_num_calc_text, (640, 183))
+
 
     # 화면에 그리기 업데이트
+    for each_note in note_group:
+        pygame.draw.rect(screen, (0,0,0), [each_note.rect.centerx, each_note.rect.centery, 20, 20])
+
+    pygame.draw.rect(screen, (0, 0, 255), [70, per_start - 40, 390, per_last + 80 - per_start])
+    pygame.draw.rect(screen, (0, 255, 0), [70, per_start - 15, 390, per_last + 30 - per_start])
+    pygame.draw.rect(screen, (255,0,0), [70, per_start, 390, per_last - per_start])
+
     note_group.draw(screen)
     note_group.update(HEIGHT)
     pygame.display.update()

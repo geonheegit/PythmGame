@@ -1,6 +1,6 @@
 import time
 import pygame
-from pygame import DOUBLEBUF, HWSURFACE, FULLSCREEN
+from pygame import HWSURFACE
 
 import note
 
@@ -43,12 +43,18 @@ count = 0
 font = pygame.font.SysFont("arial", 30, True, False)
 text_color = (0, 0, 0)
 
+perfect_text = font.render("Perfect!", True, text_color)
+
 # SFX
 hihat = pygame.mixer.Sound("sfx/hihat.wav")
 hihat.set_volume(0.2)
 
 # 노트
 note_group = pygame.sprite.Group()
+
+# 노트 판정 범위 (빨강)
+per_start = 490
+per_last = 520
 
 # note_data_file에서 노트 데이터를 불러온 뒤, note_data 리스트에 한 줄 씩 집어넣기 //// 시간(count 변수), key 순서대로 data.  한 박자 당 시간 = '3'
 note_data = []
@@ -91,19 +97,45 @@ while running:
 
     # 키 입력
         if event.type == pygame.KEYDOWN:
+            input_time = time.time()
             key_input = pygame.key.get_pressed()
 
-            if key_input[pygame.K_s]:
-                lane_light_s = "S"
+            for each_note in note_group:
+                if key_input[pygame.K_s]:
+                    lane_light_s = "S"
+                    if per_start <= each_note.rect.y <= per_last:
+                        each_note.kill()
+                        print("perfect")
+                    elif per_start - 10 <= each_note.rect.y <= per_last + 10:
+                        each_note.kill()
+                        print("good")
 
-            if key_input[pygame.K_d]:
-                lane_light_d = "D"
+                if key_input[pygame.K_d]:
+                    lane_light_d = "D"
+                    if per_start <= each_note.rect.y <= per_last:
+                        each_note.kill()
+                        print("perfect")
+                    elif per_start - 10 <= each_note.rect.y <= per_last + 10:
+                        each_note.kill()
+                        print("good")
 
-            if key_input[pygame.K_k]:
-                lane_light_k = "K"
+                if key_input[pygame.K_k]:
+                    lane_light_k = "K"
+                    if per_start <= each_note.rect.y <= per_last:
+                        each_note.kill()
+                        print("perfect")
+                    elif per_start - 10 <= each_note.rect.y <= per_last + 10:
+                        each_note.kill()
+                        print("good")
 
-            if key_input[pygame.K_l]:
-                lane_light_l = "L"
+                if key_input[pygame.K_l]:
+                    lane_light_l = "L"
+                    if per_start <= each_note.rect.y <= per_last:
+                        each_note.kill()
+                        print("perfect")
+                    elif per_start - 10 <= each_note.rect.y <= per_last + 10:
+                        each_note.kill()
+                        print("good")
                 
     # 키 입력 땠을 때
         if event.type == pygame.KEYUP:

@@ -34,6 +34,32 @@ main_bg = pygame.transform.scale(main_bg, (800, 600))  # 800 x 600 px
 lane_lighting = pygame.image.load("assets/lane_lighting.png").convert_alpha()  # 9 x 60 px
 lane_lighting = pygame.transform.scale(lane_lighting, (100, 600))  # 100 x 600 px
 
+# 노트 타격 이펙트
+eff_size_x = 100
+eff_size_y = 100
+effect_name = "flash"
+anim_index = 0
+frame_speed = 0.07
+hit_effect_list = []
+
+magic_01 = pygame.image.load(f"assets/particles/Flash/{effect_name}01.png").convert_alpha()
+magic_02 = pygame.image.load(f"assets/particles/Flash/{effect_name}02.png").convert_alpha()
+magic_03 = pygame.image.load(f"assets/particles/Flash/{effect_name}03.png").convert_alpha()
+magic_04 = pygame.image.load(f"assets/particles/Flash/{effect_name}04.png").convert_alpha()
+magic_05 = pygame.image.load(f"assets/particles/Flash/{effect_name}05.png").convert_alpha()
+
+magic_01 = pygame.transform.scale(magic_01, (eff_size_x, eff_size_y))
+magic_02 = pygame.transform.scale(magic_02, (eff_size_x, eff_size_y))
+magic_03 = pygame.transform.scale(magic_03, (eff_size_x, eff_size_y))
+magic_04 = pygame.transform.scale(magic_04, (eff_size_x, eff_size_y))
+magic_05 = pygame.transform.scale(magic_05, (eff_size_x, eff_size_y))
+
+hit_effect_list.append(magic_01)
+hit_effect_list.append(magic_02)
+hit_effect_list.append(magic_03)
+hit_effect_list.append(magic_04)
+hit_effect_list.append(magic_05)
+
 # 노래
 song = pygame.mixer.Sound("song/Duo Blade Against.wav")
 song.set_volume(0.2)
@@ -129,8 +155,6 @@ text_g_posx = 200
 text_b_posx = 200
 text_com_posx = 200
 
-print(perfect_text.get_size(), good_text.get_size(), bad_text.get_size())
-
 # 노트 맞춘 시간
 note_hit_time = 0
 
@@ -151,6 +175,11 @@ per_last = 520
 perfect_input = False
 good_input = False
 bad_input = False
+
+normal_input_s = False
+normal_input_d = False
+normal_input_k = False
+normal_input_l = False
 
 # note_data_file에서 노트 데이터를 불러온 뒤, note_data 리스트에 한 줄 씩 집어넣기 //// 시간(count 변수), key 순서대로 data.  한 박자 당 시간 = '3'
 note_data = []
@@ -203,6 +232,7 @@ while running:
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     lane_light_s = "S"
                     if each_note.key == "S":
+                        normal_input_s = True
                         if per_start <= each_note.rect.centery <= per_last:
                             # 애니메이션 겹침 방지용 변수 초기화
                             perfect_input = False
@@ -252,6 +282,7 @@ while running:
                     lane_light_d = "D"
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "D":
+                        normal_input_d = True
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
                             good_input = False
@@ -300,6 +331,7 @@ while running:
                     lane_light_k = "K"
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "K":
+                        normal_input_k = True
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
                             good_input = False
@@ -348,6 +380,7 @@ while running:
                     lane_light_l = "L"
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "L":
+                        normal_input_l = True
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
                             good_input = False
@@ -394,15 +427,19 @@ while running:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_s:
                 lane_light_s = "None"
+                normal_input = False
 
             if event.key == pygame.K_d:
                 lane_light_d = "None"
+                normal_input = False
 
             if event.key == pygame.K_k:
                 lane_light_k = "None"
+                normal_input = False
 
             if event.key == pygame.K_l:
                 lane_light_l = "None"
+                normal_input = False
 
     # 배경 그리기
     screen.blit(main_bg, (0, 0))
@@ -471,6 +508,7 @@ while running:
                 add_val = 255
             combo_text.set_alpha(255 - add_val)  # 흐릿하게
             screen.blit(combo_text, (200 * (1 / add_val) + text_com_posx + 25, 120))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
+
         else:
             perfect_input = False
             add_val = 0
@@ -522,6 +560,126 @@ while running:
         else:
             bad_input = False
             add_val = 0
+
+
+    # if event.type == pygame.KEYDOWN:
+    #     key_input = pygame.key.get_pressed()
+    #     if event.key == pygame.K_s:
+    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
+    #             if perfect_input or good_input or bad_input:
+    #                 now = time.time()
+    #                 elapsed = now - note_hit_time
+    #                 elapsed_anim = now - note_hit_time
+    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
+    #                     screen.blit(hit_effect_list[anim_index], (65, 430))
+    #                     anim_index += 1
+    #                     elapsed_anim = 0
+    #                 elif anim_index >= len(hit_effect_list):
+    #                     anim_index = 0
+    #                     elapsed = 1
+    #     if event.key == pygame.K_d:
+    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
+    #             if perfect_input or good_input or bad_input:
+    #                 now = time.time()
+    #                 elapsed = now - note_hit_time
+    #                 elapsed_anim = now - note_hit_time
+    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
+    #                     screen.blit(hit_effect_list[anim_index], (165, 430))
+    #                     anim_index += 1
+    #                     elapsed_anim = 0
+    #                 elif anim_index >= len(hit_effect_list):
+    #                     anim_index = 0
+    #                     elapsed = 1
+    #     if event.key == pygame.K_k:
+    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
+    #             if perfect_input or good_input or bad_input:
+    #                 now = time.time()
+    #                 elapsed = now - note_hit_time
+    #                 elapsed_anim = now - note_hit_time
+    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
+    #                     screen.blit(hit_effect_list[anim_index], (265, 430))
+    #                     anim_index += 1
+    #                     elapsed_anim = 0
+    #                 elif anim_index >= len(hit_effect_list):
+    #                     anim_index = 0
+    #                     elapsed = 1
+    #     if event.key == pygame.K_l:
+    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
+    #             if perfect_input or good_input or bad_input:
+    #                 now = time.time()
+    #                 elapsed = now - note_hit_time
+    #                 elapsed_anim = now - note_hit_time
+    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
+    #                     screen.blit(hit_effect_list[anim_index], (365, 430))
+    #                     anim_index += 1
+    #                     elapsed_anim = 0
+    #                 elif anim_index >= len(hit_effect_list):
+    #                     anim_index = 0
+    #                     elapsed = 1
+
+    if normal_input_s:
+        if perfect_input or good_input or bad_input:
+            now = time.time()
+            elapsed = now - note_hit_time
+            elapsed_anim = now - note_hit_time
+            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index], (65, 430))
+                anim_index += 1
+                elapsed_anim = 0
+            elif anim_index >= len(hit_effect_list):
+                anim_index = 0
+                elapsed = 1
+            if elapsed >= 1:
+                normal_input_s = False
+                anim_index = 0
+
+    if normal_input_d:
+        if perfect_input or good_input or bad_input:
+            now = time.time()
+            elapsed = now - note_hit_time
+            elapsed_anim = now - note_hit_time
+            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index], (165, 430))
+                anim_index += 1
+                elapsed_anim = 0
+            elif anim_index >= len(hit_effect_list):
+                anim_index = 0
+                elapsed = 1
+            if elapsed >= 1:
+                normal_input_d = False
+                anim_index = 0
+
+    if normal_input_k:
+        if perfect_input or good_input or bad_input:
+            now = time.time()
+            elapsed = now - note_hit_time
+            elapsed_anim = now - note_hit_time
+            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index], (265, 430))
+                anim_index += 1
+                elapsed_anim = 0
+            elif anim_index >= len(hit_effect_list):
+                anim_index = 0
+                elapsed = 1
+            if elapsed >= 1:
+                normal_input_k = False
+                anim_index = 0
+
+    if normal_input_l:
+        if perfect_input or good_input or bad_input:
+            now = time.time()
+            elapsed = now - note_hit_time
+            elapsed_anim = now - note_hit_time
+            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index], (365, 430))
+                anim_index += 1
+                elapsed_anim = 0
+            elif anim_index >= len(hit_effect_list):
+                anim_index = 0
+                elapsed = 1
+            if elapsed >= 1:
+                normal_input_l = False
+                anim_index = 0
 
     # 오른쪽 네모박스 속 요소들
     # score

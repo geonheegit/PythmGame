@@ -37,28 +37,29 @@ lane_lighting = pygame.transform.scale(lane_lighting, (100, 600))  # 100 x 600 p
 # 노트 타격 이펙트
 eff_size_x = 100
 eff_size_y = 100
-effect_name = "flash"
-anim_index = 0
-frame_speed = 0.07
+effect_name = "hit"
+anim_index_s = 0
+anim_index_d = 0
+anim_index_k = 0
+anim_index_l = 0
+
+frame_speed = 0.1
 hit_effect_list = []
 
-magic_01 = pygame.image.load(f"assets/particles/Flash/{effect_name}01.png").convert_alpha()
-magic_02 = pygame.image.load(f"assets/particles/Flash/{effect_name}02.png").convert_alpha()
-magic_03 = pygame.image.load(f"assets/particles/Flash/{effect_name}03.png").convert_alpha()
-magic_04 = pygame.image.load(f"assets/particles/Flash/{effect_name}04.png").convert_alpha()
-magic_05 = pygame.image.load(f"assets/particles/Flash/{effect_name}05.png").convert_alpha()
+magic_01 = pygame.image.load(f"assets/particles/Hits/{effect_name}-0.png").convert_alpha()
+magic_02 = pygame.image.load(f"assets/particles/Hits/{effect_name}-1.png").convert_alpha()
+magic_03 = pygame.image.load(f"assets/particles/Hits/{effect_name}-2.png").convert_alpha()
+magic_04 = pygame.image.load(f"assets/particles/Hits/{effect_name}-3.png").convert_alpha()
 
 magic_01 = pygame.transform.scale(magic_01, (eff_size_x, eff_size_y))
 magic_02 = pygame.transform.scale(magic_02, (eff_size_x, eff_size_y))
 magic_03 = pygame.transform.scale(magic_03, (eff_size_x, eff_size_y))
 magic_04 = pygame.transform.scale(magic_04, (eff_size_x, eff_size_y))
-magic_05 = pygame.transform.scale(magic_05, (eff_size_x, eff_size_y))
 
 hit_effect_list.append(magic_01)
 hit_effect_list.append(magic_02)
 hit_effect_list.append(magic_03)
 hit_effect_list.append(magic_04)
-hit_effect_list.append(magic_05)
 
 # 노래
 song = pygame.mixer.Sound("song/Duo Blade Against.wav")
@@ -157,6 +158,10 @@ text_com_posx = 200
 
 # 노트 맞춘 시간
 note_hit_time = 0
+note_hit_time_s = 0
+note_hit_time_d = 0
+note_hit_time_k = 0
+note_hit_time_l = 0
 
 # SFX
 sfx_volume = 0
@@ -232,6 +237,7 @@ while running:
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     lane_light_s = "S"
                     if each_note.key == "S":
+                        normal_input_s = False
                         normal_input_s = True
                         if per_start <= each_note.rect.centery <= per_last:
                             # 애니메이션 겹침 방지용 변수 초기화
@@ -241,7 +247,8 @@ while running:
                             add_val = 0
 
                             each_note.kill()  # 친 노트 객체 삭제
-                            note_hit_time = time.time()  # 노트를 친 순간 기록
+                            note_hit_time_s = time.time()  # 노트를 친 순간 기록
+                            note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(300)  # 점수 추가
                             perfect_add()  # 퍼펙 개수 1 추가
@@ -255,6 +262,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_s = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(150)
@@ -269,6 +277,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_s = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(50)
@@ -282,6 +291,7 @@ while running:
                     lane_light_d = "D"
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "D":
+                        normal_input_d = False
                         normal_input_d = True
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
@@ -290,6 +300,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_d = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(300)
@@ -304,6 +315,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_d = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(150)
@@ -318,6 +330,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_d = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(50)
@@ -331,6 +344,7 @@ while running:
                     lane_light_k = "K"
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "K":
+                        normal_input_k = False
                         normal_input_k = True
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
@@ -339,6 +353,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_k = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(300)
@@ -353,6 +368,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_k = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(150)
@@ -367,6 +383,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_k = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(50)
@@ -380,6 +397,7 @@ while running:
                     lane_light_l = "L"
                     hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "L":
+                        normal_input_l = False
                         normal_input_l = True
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
@@ -388,6 +406,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_l = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(300)
@@ -402,6 +421,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_l = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(150)
@@ -416,6 +436,7 @@ while running:
                             add_val = 0
 
                             each_note.kill()
+                            note_hit_time_l = time.time()
                             note_hit_time = time.time()
                             combo_add()  # 콤보 1 추가
                             score_add(50)
@@ -561,69 +582,67 @@ while running:
             bad_input = False
             add_val = 0
 
+
+    # Hit 애니메이션 구현
     if normal_input_s:
         if perfect_input or good_input or bad_input:
             now = time.time()
-            elapsed = now - note_hit_time
-            elapsed_anim = now - note_hit_time
-            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
-                screen.blit(hit_effect_list[anim_index], (65, 430))
-                anim_index += 1
-                elapsed_anim = 0
-            elif anim_index >= len(hit_effect_list):
-                anim_index = 0
-                elapsed = 1
-            if elapsed >= 1:
+            elapsed_anim = now - note_hit_time_s
+            if elapsed_anim <= frame_speed and anim_index_s < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index_s], (65, 430))
+            if elapsed_anim > frame_speed:
+                anim_index_s += 1
+                note_hit_time_s = now
+            if anim_index_s >= len(hit_effect_list):
+                anim_index_s = 0
                 normal_input_s = False
-                anim_index = 0
+    elif not normal_input_s:
+        anim_index_s = 0
 
     if normal_input_d:
         if perfect_input or good_input or bad_input:
             now = time.time()
-            elapsed = now - note_hit_time
-            elapsed_anim = now - note_hit_time
-            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
-                screen.blit(hit_effect_list[anim_index], (165, 430))
-                anim_index += 1
-                elapsed_anim = 0
-            elif anim_index >= len(hit_effect_list):
-                anim_index = 0
-                elapsed = 1
-            if elapsed >= 1:
+            elapsed_anim = now - note_hit_time_d
+            if elapsed_anim <= frame_speed and anim_index_d < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index_d], (165, 430))
+            if elapsed_anim > frame_speed:
+                anim_index_d += 1
+                note_hit_time_d = now
+            if anim_index_d >= len(hit_effect_list):
+                anim_index_d = 0
                 normal_input_d = False
-                anim_index = 0
+    elif not normal_input_d:
+        anim_index_d = 0
 
     if normal_input_k:
         if perfect_input or good_input or bad_input:
             now = time.time()
-            elapsed = now - note_hit_time
-            elapsed_anim = now - note_hit_time
-            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
-                screen.blit(hit_effect_list[anim_index], (265, 430))
-                anim_index += 1
-                elapsed_anim = 0
-            elif anim_index >= len(hit_effect_list):
-                anim_index = 0
-                elapsed = 1
-            if elapsed >= 1:
+            elapsed_anim = now - note_hit_time_k
+            if elapsed_anim <= frame_speed and anim_index_k < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index_k], (265, 430))
+            if elapsed_anim > frame_speed:
+                anim_index_k += 1
+                note_hit_time_k = now
+            if anim_index_k >= len(hit_effect_list):
+                anim_index_k = 0
                 normal_input_k = False
-                anim_index = 0
+    elif not normal_input_k:
+        anim_index_k = 0
 
     if normal_input_l:
         if perfect_input or good_input or bad_input:
             now = time.time()
-            elapsed = now - note_hit_time
-            elapsed_anim = now - note_hit_time
-            if elapsed_anim >= frame_speed and anim_index < len(hit_effect_list):
-                screen.blit(hit_effect_list[anim_index], (365, 430))
-                anim_index += 1
-                elapsed_anim = 0
-            elif anim_index >= len(hit_effect_list):
-                anim_index = 0
-                elapsed = 1
-            if elapsed >= 1:
+            elapsed_anim = now - note_hit_time_l
+            if elapsed_anim <= frame_speed and anim_index_l < len(hit_effect_list):
+                screen.blit(hit_effect_list[anim_index_l], (365, 430))
+            if elapsed_anim > frame_speed:
+                anim_index_l += 1
+                note_hit_time_l = now
+            if anim_index_l >= len(hit_effect_list):
+                anim_index_l = 0
                 normal_input_l = False
-                anim_index = 0
+    elif not normal_input_l:
+        anim_index_l = 0
 
     # 오른쪽 네모박스 속 요소들
     # score

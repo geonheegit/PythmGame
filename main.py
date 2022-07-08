@@ -561,62 +561,6 @@ while running:
             bad_input = False
             add_val = 0
 
-
-    # if event.type == pygame.KEYDOWN:
-    #     key_input = pygame.key.get_pressed()
-    #     if event.key == pygame.K_s:
-    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
-    #             if perfect_input or good_input or bad_input:
-    #                 now = time.time()
-    #                 elapsed = now - note_hit_time
-    #                 elapsed_anim = now - note_hit_time
-    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
-    #                     screen.blit(hit_effect_list[anim_index], (65, 430))
-    #                     anim_index += 1
-    #                     elapsed_anim = 0
-    #                 elif anim_index >= len(hit_effect_list):
-    #                     anim_index = 0
-    #                     elapsed = 1
-    #     if event.key == pygame.K_d:
-    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
-    #             if perfect_input or good_input or bad_input:
-    #                 now = time.time()
-    #                 elapsed = now - note_hit_time
-    #                 elapsed_anim = now - note_hit_time
-    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
-    #                     screen.blit(hit_effect_list[anim_index], (165, 430))
-    #                     anim_index += 1
-    #                     elapsed_anim = 0
-    #                 elif anim_index >= len(hit_effect_list):
-    #                     anim_index = 0
-    #                     elapsed = 1
-    #     if event.key == pygame.K_k:
-    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
-    #             if perfect_input or good_input or bad_input:
-    #                 now = time.time()
-    #                 elapsed = now - note_hit_time
-    #                 elapsed_anim = now - note_hit_time
-    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
-    #                     screen.blit(hit_effect_list[anim_index], (265, 430))
-    #                     anim_index += 1
-    #                     elapsed_anim = 0
-    #                 elif anim_index >= len(hit_effect_list):
-    #                     anim_index = 0
-    #                     elapsed = 1
-    #     if event.key == pygame.K_l:
-    #         if per_start - 60 <= each_note.rect.centery <= per_last + 60:
-    #             if perfect_input or good_input or bad_input:
-    #                 now = time.time()
-    #                 elapsed = now - note_hit_time
-    #                 elapsed_anim = now - note_hit_time
-    #                 if elapsed_anim >= 0.05 and anim_index < len(hit_effect_list):
-    #                     screen.blit(hit_effect_list[anim_index], (365, 430))
-    #                     anim_index += 1
-    #                     elapsed_anim = 0
-    #                 elif anim_index >= len(hit_effect_list):
-    #                     anim_index = 0
-    #                     elapsed = 1
-
     if normal_input_s:
         if perfect_input or good_input or bad_input:
             now = time.time()

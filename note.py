@@ -22,6 +22,3 @@ class Note(pygame.sprite.Sprite):
 
     def update(self, HEIGHT):
         self.rect.y += self.scroll_speed
-
-        # if 500 < self.rect.y < 510:
-        #     self.kill()

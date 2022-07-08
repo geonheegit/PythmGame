@@ -12,6 +12,9 @@ WIDTH = 800
 HEIGHT = 600
 screen = pygame.display.set_mode([WIDTH, HEIGHT], HWSURFACE)
 
+# 디버그 모드
+DEBUG = False
+
 # 모든 스프라이트 그룹
 all_sprite = pygame.sprite.Group()
 
@@ -21,6 +24,7 @@ perfect_num = 0
 good_num = 0
 bad_num = 0
 total_hit_num = 0
+combo = 0
 
 # 화면 택스처
 main_bg = pygame.image.load("assets/main_bg.png")  # 80 x 60 px
@@ -58,6 +62,8 @@ good_num_text = font.render("Good: ", True, (0, 0, 0))
 bad_num_text = font.render("Bad: ", True, (0, 0, 0))
 total_hit_num_text = font.render("Total: ", True, (0, 0, 0))
 
+combo_text = font.render(f"{combo} COMBO!", True, (0, 0, 0))
+
 # 점수 계산 텍스트
 score_calc_text = font.render(str(score_val), True, (0, 0, 0))
 def score_add(val):
@@ -90,13 +96,26 @@ def bad_add():
     bad_num += 1
     bad_num_calc_text = font.render(str(bad_num), True, (0, 0, 0))
 
-# Bad 개수 계산 텍스트
+# Total 개수 계산 텍스트
 total_num_calc_text = font.render(str(total_hit_num), True, (0, 0, 0))
 def total_update():
     global total_num_calc_text
     global total_hit_num
     total_hit_num = perfect_num + good_num + bad_num
     total_num_calc_text = font.render(str(total_hit_num), True, (0, 0, 0))
+
+# COMBO 개수 계산 텍스트
+def combo_add():
+    global combo_text
+    global combo
+    combo += 1
+    combo_text = font.render(f"{combo} COMBO!", True, (0, 0, 0))
+
+def reset_combo():
+    global combo_text
+    global combo
+    combo = 0
+    combo_text = font.render(f"{combo} COMBO!", True, (0, 0, 0))
 
 # 판정 이미지
 perfect_text = pygame.image.load("assets/perfect_text.png").convert_alpha()
@@ -108,6 +127,7 @@ add_val = 0
 text_p_posx = 200
 text_g_posx = 200
 text_b_posx = 200
+text_com_posx = 200
 
 print(perfect_text.get_size(), good_text.get_size(), bad_text.get_size())
 
@@ -115,8 +135,10 @@ print(perfect_text.get_size(), good_text.get_size(), bad_text.get_size())
 note_hit_time = 0
 
 # SFX
-hihat = pygame.mixer.Sound("sfx/hihat.wav")
-hihat.set_volume(0.2)
+sfx_volume = 0
+hitsound_channel = pygame.mixer.Channel(1)
+hitsound = pygame.mixer.Sound("sfx/hihat.wav")
+hitsound.set_volume(sfx_volume)
 
 # 노트
 note_group = pygame.sprite.Group()
@@ -172,11 +194,13 @@ while running:
     # 키 입력
         if event.type == pygame.KEYDOWN:
             input_time = time.time()
-            key_input = pygame.key.get_pressed()
 
             # 판정  // Perfect - 300, Good - 150, Bad - 50, Miss - 0
             for each_note in note_group:
-                if key_input[pygame.K_s]:
+                if event.key == pygame.K_s:
+                    if hitsound_channel.get_busy():  # hitsound 중복 재생 가능
+                        hitsound_channel.stop()
+                    hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     lane_light_s = "S"
                     if each_note.key == "S":
                         if per_start <= each_note.rect.centery <= per_last:
@@ -188,12 +212,13 @@ while running:
 
                             each_note.kill()  # 친 노트 객체 삭제
                             note_hit_time = time.time()  # 노트를 친 순간 기록
+                            combo_add()  # 콤보 1 추가
                             score_add(300)  # 점수 추가
                             perfect_add()  # 퍼펙 개수 1 추가
                             total_update()  # 전체 개수
                             perfect_input = True
 
-                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                        elif per_start - 30 <= each_note.rect.centery <= per_last + 30:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -201,12 +226,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(150)
                             good_add()  # Good 개수 1 추가
                             total_update()  # 전체 개수
                             good_input = True
 
-                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                        elif per_start - 60 <= each_note.rect.centery <= per_last + 60:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -214,13 +240,17 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(50)
                             bad_add()  # Bad 개수 1 추가
                             total_update()  # 전체 개수
                             bad_input = True
 
-                if key_input[pygame.K_d]:
+                if event.key == pygame.K_d:
+                    if hitsound_channel.get_busy():  # hitsound 중복 재생 가능
+                        hitsound_channel.stop()
                     lane_light_d = "D"
+                    hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "D":
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
@@ -230,12 +260,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(300)
                             perfect_add()  # 퍼펙 개수 1 추가
                             total_update()  # 전체 개수
                             perfect_input = True
 
-                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                        elif per_start - 30 <= each_note.rect.centery <= per_last + 30:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -243,12 +274,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(150)
                             good_add()  # Good 개수 1 추가
                             total_update()  # 전체 개수
                             good_input = True
 
-                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                        elif per_start - 60 <= each_note.rect.centery <= per_last + 60:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -256,13 +288,17 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(50)
                             bad_add()  # Bad 개수 1 추가
                             total_update()  # 전체 개수
                             bad_input = True
 
-                if key_input[pygame.K_k]:
+                if event.key == pygame.K_k:
+                    if hitsound_channel.get_busy():  # hitsound 중복 재생 가능
+                        hitsound_channel.stop()
                     lane_light_k = "K"
+                    hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "K":
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
@@ -272,12 +308,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(300)
                             perfect_add()  # 퍼펙 개수 1 추가
                             total_update()  # 전체 개수
                             perfect_input = True
 
-                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                        elif per_start - 30 <= each_note.rect.centery <= per_last + 30:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -285,12 +322,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(150)
                             good_add()  # Good 개수 1 추가
                             total_update()  # 전체 개수
                             good_input = True
 
-                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                        elif per_start - 60 <= each_note.rect.centery <= per_last + 60:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -298,13 +336,17 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(50)
                             bad_add()  # Bad 개수 1 추가
                             total_update()  # 전체 개수
                             bad_input = True
 
-                if key_input[pygame.K_l]:
+                if event.key == pygame.K_l:
+                    if hitsound_channel.get_busy():  # hitsound 중복 재생 가능
+                        hitsound_channel.stop()
                     lane_light_l = "L"
+                    hitsound_channel.play(hitsound)  # 히트 사운드 재생
                     if each_note.key == "L":
                         if per_start <= each_note.rect.centery <= per_last:
                             perfect_input = False
@@ -314,12 +356,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(300)
                             perfect_add()  # 퍼펙 개수 1 추가
                             total_update()  # 전체 개수
                             perfect_input = True
 
-                        elif per_start - 15 <= each_note.rect.centery <= per_last + 15:
+                        elif per_start - 30 <= each_note.rect.centery <= per_last + 30:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -327,12 +370,13 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(150)
                             good_add()  # Good 개수 1 추가
                             total_update()  # 전체 개수
                             good_input = True
 
-                        elif per_start - 40 <= each_note.rect.centery <= per_last + 40:
+                        elif per_start - 60 <= each_note.rect.centery <= per_last + 60:
                             perfect_input = False
                             good_input = False
                             bad_input = False
@@ -340,6 +384,7 @@ while running:
 
                             each_note.kill()
                             note_hit_time = time.time()
+                            combo_add()  # 콤보 1 추가
                             score_add(50)
                             bad_add()  # Bad 개수 1 추가
                             total_update()  # 전체 개수
@@ -419,6 +464,13 @@ while running:
                 add_val = 255
             perfect_text.set_alpha(255 - add_val)  # 흐릿하게
             screen.blit(perfect_text, (200 * (1 / add_val) + text_p_posx, 50))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
+
+            # COMBO 애니메이션
+            add_val += 6
+            if add_val > 255:
+                add_val = 255
+            combo_text.set_alpha(255 - add_val)  # 흐릿하게
+            screen.blit(combo_text, (200 * (1 / add_val) + text_com_posx + 25, 120))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
         else:
             perfect_input = False
             add_val = 0
@@ -436,6 +488,13 @@ while running:
                 add_val = 255
             good_text.set_alpha(255 - add_val)  # 흐릿하게
             screen.blit(good_text, (200 * (1 / add_val) + text_g_posx, 50))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
+
+            # COMBO 애니메이션
+            add_val += 6
+            if add_val > 255:
+                add_val = 255
+            combo_text.set_alpha(255 - add_val)  # 흐릿하게
+            screen.blit(combo_text, (200 * (1 / add_val) + text_com_posx + 25, 120))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
         else:
             good_input = False
             add_val = 0
@@ -453,6 +512,13 @@ while running:
                 add_val = 255
             bad_text.set_alpha(255 - add_val)  # 흐릿하게
             screen.blit(bad_text, (200 * (1 / add_val) + text_b_posx, 50))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
+
+            # COMBO 애니메이션
+            add_val += 6
+            if add_val > 255:
+                add_val = 255
+            combo_text.set_alpha(255 - add_val)  # 흐릿하게
+            screen.blit(combo_text, (200 * (1 / add_val) + text_com_posx + 25, 120))  # 오른쪽에서 왼쪽으로 슬라이딩 이펙트
         else:
             bad_input = False
             add_val = 0
@@ -478,14 +544,20 @@ while running:
     screen.blit(total_hit_num_text, (520, 180))
     screen.blit(total_num_calc_text, (640, 183))
 
+    if DEBUG:
+        # 화면에 그리기 업데이트
+        for each_note in note_group:
+            pygame.draw.rect(screen, (0,0,0), [each_note.rect.centerx, each_note.rect.centery, 20, 20])
 
-    # 화면에 그리기 업데이트
+        pygame.draw.rect(screen, (0, 0, 255), [70, per_start - 60, 390, per_last + 120 - per_start])
+        pygame.draw.rect(screen, (0, 255, 0), [70, per_start - 30, 390, per_last + 60 - per_start])
+        pygame.draw.rect(screen, (255,0,0), [70, per_start, 390, per_last - per_start])
+
+    # MISS시 콤보 초기화 및 노트 객체 제거
     for each_note in note_group:
-        pygame.draw.rect(screen, (0,0,0), [each_note.rect.centerx, each_note.rect.centery, 20, 20])
-
-    pygame.draw.rect(screen, (0, 0, 255), [70, per_start - 40, 390, per_last + 80 - per_start])
-    pygame.draw.rect(screen, (0, 255, 0), [70, per_start - 15, 390, per_last + 30 - per_start])
-    pygame.draw.rect(screen, (255,0,0), [70, per_start, 390, per_last - per_start])
+        if each_note.rect.y > 700:
+            each_note.kill()
+            reset_combo()
 
     note_group.draw(screen)
     note_group.update(HEIGHT)

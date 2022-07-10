@@ -61,6 +61,10 @@ hit_effect_list.append(magic_02)
 hit_effect_list.append(magic_03)
 hit_effect_list.append(magic_04)
 
+# BPM에 따라 증가하는 인덱스
+BPM = 202
+count = 0
+
 # 노래
 song = pygame.mixer.Sound("song/Duo Blade Against.wav")
 song.set_volume(0.2)
@@ -72,10 +76,6 @@ beatdiv_const = 4  # 4beat * 4 = 16beat
 clock = pygame.time.Clock()
 clock.tick(60)
 start_time = time.time()
-
-# BPM에 따라 증가하는 인덱스
-BPM = 202
-count = 0
 
 # 폰트
 font = pygame.font.Font("assets/font/Facon.ttf", 30)
@@ -164,7 +164,7 @@ note_hit_time_k = 0
 note_hit_time_l = 0
 
 # SFX
-sfx_volume = 0
+sfx_volume = 0.2
 hitsound_channel = pygame.mixer.Channel(1)
 hitsound = pygame.mixer.Sound("sfx/hihat.wav")
 hitsound.set_volume(sfx_volume)
